@@ -7,6 +7,7 @@ use Echosign\Interfaces\HttpTransport;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Message\Response;
+use GuzzleHttp\Psr7\Request;
 
 /**
  * Class GuzzleTransport
@@ -56,13 +57,12 @@ class GuzzleTransport implements HttpTransport
             throw new \RuntimeException( 'request url is empty.' );
         }
 
-        $request = $this->client->createRequest(
+        $request = new Request(
             $httpRequest->getRequestMethod(),
             $url,
+            $httpRequest->getHeaders(),
             $requestBody
         );
-
-        $request->setHeaders( $httpRequest->getHeaders() );
 
         try {
             $response = $this->client->send( $request );
