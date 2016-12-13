@@ -42,13 +42,9 @@ class GuzzleTransport implements HttpTransport
     public function handleRequest( HttpRequest $httpRequest )
     {
         if ($httpRequest->isJsonRequest()) {
-            $requestBody['json'] = $httpRequest->getBody();
+            $request_body = json_ecode($httpRequest->getBody());
         } else {
-            $requestBody['body'] = $httpRequest->getBody();
-        }
-
-        if ($httpRequest->saveResponseToFile()) {
-            $requestBody['save_to'] = $httpRequest->getFileSavePath();
+            $request_body = $httpRequest->getBody();
         }
 
         $url = $httpRequest->getRequestUrl();
