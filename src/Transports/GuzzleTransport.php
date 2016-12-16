@@ -52,16 +52,21 @@ class GuzzleTransport implements HttpTransport
         if (empty( $url )) {
             throw new \RuntimeException( 'request url is empty.' );
         }
+        
+        $options = array();
+        if ($httpRequest->saveResponseToFile()) {
+            $options['sink'] = $httpRequest->getFileSavePath();
+        }
 
         $request = new Request(
             $httpRequest->getRequestMethod(),
             $url,
             $httpRequest->getHeaders(),
-            $requestBody
+            $request_body
         );
 
         try {
-            $response = $this->client->send( $request );
+            $response = $this->client->send($request, $options);
         } catch( ClientException $e ) {
             $this->httpException = $e;
             $response            = $e->getResponse();
