@@ -46,6 +46,10 @@ class GuzzleTransport implements HttpTransport
         } else {
             $request_body = $httpRequest->getBody();
         }
+        
+        if (empty($request_body)) {
+            $request_body = null;
+        }
 
         $url = $httpRequest->getRequestUrl();
 
