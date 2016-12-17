@@ -42,7 +42,7 @@ class GuzzleTransport implements HttpTransport
     public function handleRequest( HttpRequest $httpRequest )
     {
         if ($httpRequest->isJsonRequest()) {
-            $request_body = json_ecode($httpRequest->getBody());
+            $request_body = json_encode($httpRequest->getBody());
         } else {
             $request_body = $httpRequest->getBody();
         }
@@ -89,7 +89,7 @@ class GuzzleTransport implements HttpTransport
             return $response;
         }
 
-        $json = $response->json();
+        $json = json_decode($response->getBody(), true);
 
         // adobe says hey this didn't work!
         if ($response->getStatusCode() >= 400) {
