@@ -41,12 +41,19 @@ class GuzzleTransport implements HttpTransport
      */
     public function handleRequest( HttpRequest $httpRequest )
     {
+        $request_headers = $httpRequest->getHeaders();
         if ($httpRequest->isJsonRequest()) {
             $request_body = json_encode($httpRequest->getBody());
         } else {
             $request_body = $httpRequest->getBody();
         }
-        
+        if (is_array($request_body) &&
+            isset($request_body['File']) &&
+            isset($request_body['Mime-Type'])
+        ) {
+            $request_headers['Content-Type'] = $request_body['Mime-Type'];
+            $request_body = $request_body['File'];
+        }
         if (empty($request_body)) {
             $request_body = null;
         }
@@ -65,7 +72,7 @@ class GuzzleTransport implements HttpTransport
         $request = new Request(
             $httpRequest->getRequestMethod(),
             $url,
-            $httpRequest->getHeaders(),
+            $request_headers,
             $request_body
         );
 
@@ -87,7 +94,9 @@ class GuzzleTransport implements HttpTransport
     public function handleResponse( $response )
     {
         $contentType = $response->getHeader( 'content-type' );
-
+        if (is_array($contentType)) {
+            $contentType = array_pop($contentType);
+        }
         // if its not json, then just return the response and handle it in your own object.
         if (stripos( $contentType, 'application/json' ) === false) {
             return $response;
