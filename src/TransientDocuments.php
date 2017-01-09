@@ -34,9 +34,15 @@ class TransientDocuments extends Resource
         $request = new PostRequest( $this->getOAuthToken(), $this->getRequestUrl() );
         $request->setJsonRequest( false );
         $request->setBody( [
-            'File-Name' => $this->fileName,
-            'Mime-Type' => $this->mimeType,
-            'File'      => fopen( $this->pathToFile, 'r' )
+            [
+                'name' => 'File',
+                'headers' => [ 'Content-Type' => $this->mimeType ],
+                'contents' => fopen( $this->pathToFile, 'r' )
+            ],
+            [
+                'name' => 'File-Name',
+                'contents' => $this->fileName,
+            ]
         ] );
 
         $this->setRequest( $request );

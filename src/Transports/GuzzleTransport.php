@@ -41,22 +41,18 @@ class GuzzleTransport implements HttpTransport
      */
     public function handleRequest( HttpRequest $httpRequest )
     {
-        $request_headers = $httpRequest->getHeaders();
+        $options = array();
+        $options['headers'] = $httpRequest->getHeaders();
         if ($httpRequest->isJsonRequest()) {
-            $request_body = json_encode($httpRequest->getBody());
+            $options['json'] = $httpRequest->getBody();
         } else {
-            $request_body = $httpRequest->getBody();
+            $options['body'] = $httpRequest->getBody();
         }
-        if (is_array($request_body) &&
-            isset($request_body['File']) &&
-            isset($request_body['Mime-Type'])
-        ) {
-            $request_headers['Content-Type'] = $request_body['Mime-Type'];
-            $request_body = $request_body['File'];
+        if (isset($options['body']) && is_array($options['body'])) {
+            $options['multipart'] = $options['body'];
+            unset($options['body']);
         }
-        if (empty($request_body)) {
-            $request_body = null;
-        }
+        
 
         $url = $httpRequest->getRequestUrl();
 
@@ -64,20 +60,16 @@ class GuzzleTransport implements HttpTransport
             throw new \RuntimeException( 'request url is empty.' );
         }
         
-        $options = array();
         if ($httpRequest->saveResponseToFile()) {
             $options['sink'] = $httpRequest->getFileSavePath();
         }
-
-        $request = new Request(
-            $httpRequest->getRequestMethod(),
-            $url,
-            $request_headers,
-            $request_body
-        );
-
+        
         try {
-            $response = $this->client->send($request, $options);
+            $response = $this->client->request(
+                $httpRequest->getRequestMethod(),
+                $url,
+                $options
+            );
         } catch( ClientException $e ) {
             $this->httpException = $e;
             $response            = $e->getResponse();
