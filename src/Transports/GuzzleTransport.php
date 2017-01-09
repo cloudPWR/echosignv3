@@ -52,7 +52,6 @@ class GuzzleTransport implements HttpTransport
             $options['multipart'] = $options['body'];
             unset($options['body']);
         }
-        
 
         $url = $httpRequest->getRequestUrl();
 

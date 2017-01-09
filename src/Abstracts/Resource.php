@@ -255,11 +255,14 @@ abstract class Resource
      * @param array $query
      * @return bool
      */
-    protected function saveFileRequest( $saveToPath, array $query = [ ] )
+    protected function saveFileRequest( $saveToPath, array $query = [ ], string $content_type = null )
     {
         $request = new GetRequest( $this->getOAuthToken(), $this->getRequestUrl( $query ) );
         $request->setFileSavePath( $saveToPath );
         $request->setJsonRequest( false );
+        if (!is_null($content_type)) {
+            $request->setHeader('Content-Type', $content_type);
+        }
 
         $this->setRequest( $request );
         $this->logDebug( "GET: " . $this->getRequestUrl( $query ) );

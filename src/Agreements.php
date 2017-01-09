@@ -156,7 +156,7 @@ class Agreements extends Resource
     {
         $this->setApiRequestUrl( $agreementId . '/formData' );
 
-        return $this->saveFileRequest( $saveToPath );
+        return $this->saveFileRequest( $saveToPath, array(), 'application/json' );
     }
 
     /**
